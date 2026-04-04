@@ -1,0 +1,66 @@
+---
+volumes:
+  grafana-storage:
+    name: grafana-storage
+  loki-storage:
+    name: loki-storage
+services:
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    restart: always
+    volumes:
+      - loki-storage:/loki
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}"
+        max-file: "5"
+        max-size: "500m"
+  promtail:
+    container_name: promtail
+    image: grafana/promtail
+    restart: always
+    labels:
+      - 'logtarget=loki'
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}"
+        max-file: "5"
+        max-size: "500m"
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    restart: always
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./ds.yml:/etc/grafana/provisioning/datasources/ds.yaml:ro
+      - ./dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_ROOT_URL=http://grafana.example.com/grafana
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_FEATURE_TOGGLES_ENABLE=alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}"
+        max-file: "5"
+        max-size: "500m"
+  app:
+    image: myapp
+    container_name: myapp
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.ImageName}}|{{.Name}}"
+        max-file: "5"
+        max-size: "500m"
