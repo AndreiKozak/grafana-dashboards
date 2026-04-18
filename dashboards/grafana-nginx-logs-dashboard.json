@@ -44,23 +44,27 @@
         "prettifyLogMessage": false,
         "showCommonLabels": false,
         "showControls": false,
+        "showFieldSelector": false,
         "showLabels": false,
+        "showLevel": false,
         "showTime": false,
         "sortOrder": "Descending",
+        "timestampResolution": "ms",
+        "unwrappedColumns": false,
         "wrapLogMessage": false
       },
-      "pluginVersion": "12.3.1",
+      "pluginVersion": "13.0.1",
       "targets": [
         {
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{job=\"containerlogs\", app=~\"${App:regex}\", machine=\"$Machine\"}",
+          "expr": "{machine=\"$Machine\", job=\"nginx\", domain=~`${domain:regex}`, log_type=~`${logtype:regex}`}",
           "maxLines": 5000,
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Logs",
+      "title": "Nginx Logs",
       "type": "logs"
     }
   ],
@@ -100,12 +104,13 @@
         "definition": "",
         "description": "",
         "includeAll": false,
+        "multi": false,
         "name": "Machine",
         "options": [],
         "query": {
           "label": "machine",
           "refId": "LokiVariableQueryEditor-VariableQuery",
-          "stream": "{job=\"containerlogs\"}",
+          "stream": "{job=\"nginx\"}",
           "type": 1
         },
         "refresh": 1,
@@ -128,13 +133,44 @@
         },
         "definition": "",
         "includeAll": true,
+        "label": "Domain",
         "multi": true,
-        "name": "App",
+        "name": "domain",
         "options": [],
         "query": {
-          "label": "app",
+          "label": "domain",
           "refId": "LokiVariableQueryEditor-VariableQuery",
-          "stream": "{job=\"containerlogs\", machine=\"$Machine\"}",
+          "stream": "{job=\"nginx\", machine=\"$Machine\"}",
+          "type": 1
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "${datasource}"
+        },
+        "definition": "",
+        "includeAll": true,
+        "label": "LogType",
+        "multi": false,
+        "name": "logtype",
+        "options": [],
+        "query": {
+          "label": "log_type",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "{job=\"nginx\", machine=\"$Machine\"}",
           "type": 1
         },
         "refresh": 1,
@@ -148,8 +184,8 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
-  "title": "Logs",
-  "uid": "qwertyz",
-  "version": 1
+  "timezone": "browser",
+  "title": "Nginx-logs",
+  "uid": "qwertyx",
+  "version": 2
 }

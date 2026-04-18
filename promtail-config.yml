@@ -41,3 +41,17 @@ scrape_configs:
           image:
       - output:
           source: log
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          __path__: /var/log/nginx/*.log
+    pipeline_stages:
+      - regex:
+          source: filename
+          expression: '/var/log/nginx/(?P<domain>[^-]+)-(?P<log_type>access|error)\.log'
+      - labels:
+          domain:
+          log_type:
